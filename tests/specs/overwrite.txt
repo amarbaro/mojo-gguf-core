@@ -1,0 +1,4 @@
+kv k1 u32 1
+kv k2 str two
+kv k1 u32 3
+tensor t 0 1

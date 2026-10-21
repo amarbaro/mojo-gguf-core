@@ -1,0 +1,5 @@
+kv general.alignment u32 64
+kv general.name str aligned
+tensor a 0 3
+tensor b 1 5
+tensor c 8 32
