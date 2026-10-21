@@ -5,7 +5,10 @@
 Value type constants: `T_UINT8 0, T_INT8 1, T_UINT16 2, T_INT16 3, T_UINT32 4, T_INT32 5,
 T_FLOAT32 6, T_BOOL 7, T_STRING 8, T_ARRAY 9, T_UINT64 10, T_INT64 11, T_FLOAT64 12`.
 
-## Gguf(path) raises
+## Gguf(path, known_types=True) raises
+
+`known_types=False` accepts ggml type ids this library does not know (forks such as PQ2_0 = 142):
+those tensors get `nbytes = -1`, no bounds check, and an empty `data()`.
 
 mmaps the whole file read-only (unmapped when the value is destroyed) and parses it. Errors are
 `gguf: <path>: <what>`: `cannot open`, `bad magic`, `big-endian files are not supported`,

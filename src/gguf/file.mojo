@@ -65,7 +65,9 @@ struct TensorInfo(Copyable, Movable):
 
 
 struct Gguf(Movable):
-    """One GGUF v2/v3 little-endian file, mmapped read-only. kvs and tensors keep file order."""
+    """One GGUF v2/v3 little-endian file, mmapped read-only. kvs and tensors keep file order.
+    known_types=False accepts ggml types this library does not know (forks add their own): such a
+    tensor gets nbytes -1, no bounds check, and an empty data() span."""
 
     var path: String
     var base: Int
@@ -77,7 +79,7 @@ struct Gguf(Movable):
     var kvs: List[KV]
     var tensors: List[TensorInfo]
 
-    def __init__(out self, path: String) raises:
+    def __init__(out self, path: String, known_types: Bool = True) raises:
         self.path = path.copy()
         self.base = 0
         self.pos = 0
@@ -90,7 +92,7 @@ struct Gguf(Movable):
         var fd = external_call["open64", Int32](p.as_c_string_span().ptr(), Int32(0o2000000))
         if fd < 0:
             raise Error("gguf: cannot open ", path)
-        self.size = Int(external_call["lseek", Int64](fd, Int64(0), Int32(2)))
+        self.size = Int(external_call["lseek64", Int64](fd, Int64(0), Int32(2)))
         if self.size > 0:
             self.base = external_call["mmap", Int](Int(0), self.size, Int32(1), Int32(2), fd, Int64(0))
         _ = external_call["close", Int32](fd)
@@ -135,15 +137,16 @@ struct Gguf(Movable):
                 dims.append(self._u(8))
             var ttype = self._u(4)
             var bs = type_size(ttype)
-            if bs[0] == 0:
+            if bs[0] == 0 and known_types:
                 raise Error("gguf: ", path, ": tensor ", name, " has unknown type ", ttype)
-            var t = TensorInfo(name^, dims^, ttype, self._u(8), 0)
-            t.nbytes = t.numel() * bs[1] // bs[0]
+            var t = TensorInfo(name^, dims^, ttype, self._u(8), -1)
+            if bs[0]:
+                t.nbytes = t.numel() * bs[1] // bs[0]
             self.tensors.append(t^)
         self.data_offset = pad_to(self.pos, self.alignment)
         for i in range(len(self.tensors)):
             ref t = self.tensors[i]
-            if self.data_offset + t.offset + t.nbytes > self.size:
+            if t.nbytes >= 0 and self.data_offset + t.offset + t.nbytes > self.size:
                 raise Error("gguf: ", path, ": tensor ", t.name, " runs past the end of the file")
             for j in range(i):
                 if self.tensors[j].name == t.name:
@@ -260,7 +263,7 @@ struct Gguf(Movable):
     def data(self, i: Int) -> Span[UInt8, origin_of(self)]:
         """The bytes of tensors[i], no copy."""
         var at = self.data_offset + self.tensors[i].offset
-        return self.bytes()[at : at + self.tensors[i].nbytes]
+        return self.bytes()[at : at + max(self.tensors[i].nbytes, 0)]
 
     def __deinit__(deinit self):
         if self.base:

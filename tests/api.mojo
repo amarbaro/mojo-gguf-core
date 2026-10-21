@@ -26,4 +26,8 @@ def main() raises:
             pass
     if not raised:
         raise Error("api: an invalid call did not raise")
+    var lax = Gguf(".work/fx/bad_ttype.gguf", known_types=False)
+    var u = lax.tensor("blk.0.i8")
+    if lax.tensors[u].ttype != 4 or lax.tensors[u].nbytes != -1 or len(lax.data(u)) != 0:
+        raise Error("api: known_types=False")
     print("api: ok")

@@ -1,6 +1,6 @@
 [project]
 name = "mojo-gguf-core"
-version = "0.1.0"
+version = "0.1.1"
 description = "Read (mmapped, zero copy) and write GGUF files from Mojo, as gguf-py does"
 license = "Apache-2.0"
 requires-python = ">=3.11,<3.15"

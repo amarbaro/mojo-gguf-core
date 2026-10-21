@@ -49,6 +49,7 @@ done
 echo "real: $nl local files read identically${REAL:+ ($REAL)}"
 if [[ $CASES == .work/cases ]]; then
   $M run -I src tests/api.mojo || { echo "FAIL api: tests/api.mojo"; exit 1; }
+  $M run -I src tests/coexist.mojo || { echo "FAIL coexist: tests/coexist.mojo (a libc declaration clashes with the stdlib)"; exit 1; }
   $M run -I src examples/quickstart.mojo > /dev/null || { echo "FAIL example: examples/quickstart.mojo"; exit 1; }
 fi
 echo "PASS all"

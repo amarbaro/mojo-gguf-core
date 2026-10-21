@@ -11,7 +11,7 @@ mutants=(
   "src/gguf/file.mojo|        var at = self.kvs[i].start + 12|        var at = self.kvs[i].start + 8|string array offset"
   "src/gguf/file.mojo|84, 110, 144, 176|84, 110, 142, 176|Q4_K block size"
   "src/gguf/file.mojo|                self.vals[i] = v^\n                return|                pass|re-added key appended"
-  "src/gguf/file.mojo|            if self.data_offset + t.offset + t.nbytes > self.size:|            if False:|tensor past end of file accepted"
+  "src/gguf/file.mojo|            if t.nbytes >= 0 and self.data_offset + t.offset + t.nbytes > self.size:|            if False:|tensor past end of file accepted"
 )
 for m in "${mutants[@]}"; do
   IFS='|' read -r file from to why <<< "$m"
