@@ -25,7 +25,7 @@ def main() raises:
 
 ## Install
 
-Requires Mojo 1.1 on Linux. Builds on Mojo 1.2 nightly too.
+Requires Mojo 1.2 on Linux.
 
 | Way | Command |
 |---|---|
