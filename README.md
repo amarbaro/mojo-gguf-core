@@ -1,6 +1,9 @@
 # mojo-gguf-core
 
-[![CI](https://github.com/amarbaro/mojo-gguf-core/actions/workflows/ci.yml/badge.svg)](https://github.com/amarbaro/mojo-gguf-core/actions/workflows/ci.yml)
+<!-- badges -->
+[![ci](https://github.com/amarbaro/mojo-gguf-core/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/amarbaro/mojo-gguf-core/actions/workflows/ci.yml) [![latest release](https://img.shields.io/github/v/release/amarbaro/mojo-gguf-core)](https://github.com/amarbaro/mojo-gguf-core/releases/latest) [![license](https://img.shields.io/github/license/amarbaro/mojo-gguf-core)](https://github.com/amarbaro/mojo-gguf-core/blob/main/LICENSE)
+<!-- /badges -->
+
 
 Read and write [GGUF](https://github.com/ggml-org/ggml/blob/master/docs/gguf.md) files (the
 llama.cpp model format) from Mojo. The reader mmaps the file and parses the header,
