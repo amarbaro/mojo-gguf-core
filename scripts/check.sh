@@ -36,7 +36,7 @@ for f in $F/reject/*.gguf; do
   [[ $got == error ]] || { echo "FAIL reject: $(basename "$f") must be rejected, got: ${got:0:120}"; exit 1; }
   nj=$((nj + 1))
 done
-echo "reject: $nj files with a length, count or offset >= 2^63 rejected"
+echo "reject: $nj files with a length, count or offset >= 2^63, or arrays nested 10000 deep, rejected"
 echo "oracle: $nr files read identically, $ne rejected as gguf-py rejects them"
 echo "writer: $nc copies byte-identical to the GGUFWriter originals"
 nb=0

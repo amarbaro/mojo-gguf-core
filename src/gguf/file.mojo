@@ -5,6 +5,7 @@ from std.collections import Dict
 from std.ffi import external_call
 from std.memory import bitcast
 
+comptime MAX_DEPTH = 32  # nested arrays: _skip recurses once per level
 comptime MAGIC = 0x46554747  # "GGUF"
 comptime T_UINT8 = 0
 comptime T_INT8 = 1
@@ -197,10 +198,12 @@ struct Gguf(Movable):
         var n = self._str_len()
         return String(from_utf8_lossy=self.bytes()[self.pos - n : self.pos])
 
-    def _skip(mut self, t: Int) raises:
+    def _skip(mut self, t: Int, depth: Int = 0) raises:
         if t == T_STRING:
             _ = self._str_len()
         elif t == T_ARRAY:
+            if depth >= MAX_DEPTH:
+                raise Error("gguf: ", self.path, ": arrays nested more than ", MAX_DEPTH, " deep at byte ", self.pos)
             var et = self._u(4)
             var n = self._u(8)
             if n < 0:
@@ -212,7 +215,7 @@ struct Gguf(Movable):
                 self.pos += n * w
             else:
                 for _ in range(n):
-                    self._skip(et)
+                    self._skip(et, depth + 1)
         elif _width(t):
             _ = self._u(_width(t))
         else:

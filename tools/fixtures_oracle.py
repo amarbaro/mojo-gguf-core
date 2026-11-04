@@ -37,6 +37,9 @@ put("count_lie", b[:16] + struct.pack("<Q", 40) + b[24:])
 os.makedirs(os.path.join(D, "reject"), exist_ok=True)
 def rej(name, data):
     open(os.path.join(D, "reject", name + ".gguf"), "wb").write(data)
+# arrays nested 10000 deep (a 12-byte header per level): the walk recurses once per level, so it needs a depth cap
+deep = b"GGUF" + struct.pack("<IQQ", 3, 0, 1) + struct.pack("<Q", 1) + b"x" + struct.pack("<I", 9) + struct.pack("<IQ", 9, 1) * 10000 + struct.pack("<IQ", 4, 0)
+rej("deep_arrays", deep)
 put("neg_str", b[:24] + struct.pack("<Q", 0xFFFFFFFFFFFF7960) + b[32:])
 i = find("blk.0.i8"); rej("neg_off", b[:i + 24] + struct.pack("<Q", 0xFFFFFFFFFFFFFFE0) + b[i + 32:])
 i = find("a.arr_u8"); rej("neg_arr", b[:i + 16] + struct.pack("<Q", 1 << 63) + b[i + 24:])
