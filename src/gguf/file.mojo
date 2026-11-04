@@ -139,7 +139,10 @@ struct Gguf(Movable):
             var bs = type_size(ttype)
             if bs[0] == 0 and known_types:
                 raise Error("gguf: ", path, ": tensor ", name, " has unknown type ", ttype)
-            var t = TensorInfo(name^, dims^, ttype, self._u(8), -1)
+            var off = self._u(8)
+            if off < 0:
+                raise Error("gguf: ", path, ": tensor ", name, " has a negative offset")
+            var t = TensorInfo(name^, dims^, ttype, off, -1)
             if bs[0]:
                 t.nbytes = t.numel() * bs[1] // bs[0]
             self.tensors.append(t^)
