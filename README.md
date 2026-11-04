@@ -24,12 +24,7 @@ def main() raises:
     for i in range(len(g.tensors)):
         print(g.tensors[i].name, g.tensors[i].ttype, g.tensors[i].numel(), len(g.data(i)))
 ```
-
-| | mojo-gguf-core | gguf-py 0.19 |
-|---|---|---|
-| 20.9 GB Q4_K_S model, 142 KVs, 733 tensors, 248k tokens | 36 ms, 29 MB | 5,535 ms, 863 MB |
 <!-- /install -->
-
 
 Read and write [GGUF](https://github.com/ggml-org/ggml/blob/master/docs/gguf.md) files (the
 llama.cpp model format) from Mojo. The reader mmaps the file and parses the header,
@@ -37,30 +32,7 @@ key-values and tensor table in place. Tensor data is a `Span` into the mapping, 
 model opens in 36 ms at 29 MB RSS. The writer produces the bytes gguf-py's `GGUFWriter`
 produces. The gate checks everything against gguf-py 0.19.0. 360 lines, no dependencies.
 
-```mojo
-from gguf import Gguf, Writer, T_UINT32
-
-def main() raises:
-    var g = Gguf("model.gguf")                          # mmapped, nothing copied
-    print(g.str(g.find("general.architecture")), len(g.tensors))
-    var vocab = g.strs(g.find("tokenizer.ggml.tokens"))
-    var w = g.data(g.tensor("token_embd.weight"))      # Span[UInt8] into the file
-
-    var out = Writer()
-    out.add_str("general.name", "demo")
-    out.add_int("demo.context_length", T_UINT32, 4096)
-    out.save("demo.gguf")
-```
-
-## Install
-
 Requires Mojo 1.2 on Linux.
-
-| Way | Command |
-|---|---|
-| Source path | `mojo run -I path/to/mojo-gguf-core/src app.mojo` |
-| Precompiled | `mojo precompile src/gguf -o gguf.mojoc` |
-| Vendor | copy `src/gguf/` into your project |
 
 ## What you get
 
