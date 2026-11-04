@@ -31,3 +31,10 @@ j = a.index(b"general.alignment") + 17 + 4
 put("align3", a[:j] + struct.pack("<I", 3) + a[j + 4:])
 put("align_type", a[:j - 4] + struct.pack("<I", 5) + a[j:])
 put("count_lie", b[:16] + struct.pack("<Q", 40) + b[24:])
+# lengths, counts and offsets at or above 2^63 are negative Ints in the reader: each must be rejected, never indexed.
+# gguf-py rejects neg_str and ovf_dims (bad_*, compared with it); it accepts or hangs on the other two, so
+# reject/ files are checked against "error" only.
+os.makedirs(os.path.join(D, "reject"), exist_ok=True)
+def rej(name, data):
+    open(os.path.join(D, "reject", name + ".gguf"), "wb").write(data)
+put("neg_str", b[:24] + struct.pack("<Q", 0xFFFFFFFFFFFF7960) + b[32:])

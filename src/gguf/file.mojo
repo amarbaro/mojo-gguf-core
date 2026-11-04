@@ -168,7 +168,7 @@ struct Gguf(Movable):
 
     def _str(mut self) raises -> String:
         var n = self._u(8)
-        if n > self.size - self.pos:
+        if n < 0 or n > self.size - self.pos:
             raise Error("gguf: ", self.path, ": truncated string at byte ", self.pos)
         self.pos += n
         return String(from_utf8_lossy=self.bytes()[self.pos - n : self.pos])

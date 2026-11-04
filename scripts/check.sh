@@ -16,7 +16,7 @@ if [[ $CASES == .work/cases ]]; then
   $M build -I src tests/cases.mojo -o .work/cases 2>.work/build.err || { echo "FAIL build: tests/cases.mojo"; cat .work/build.err; exit 1; }
 fi
 F=.work/fx
-[[ -f $F/many.gguf ]] || $O tools/fixtures_oracle.py $F || { echo "FAIL setup: fixtures"; exit 1; }
+[[ -f $F/many.gguf && -d $F/reject ]] || $O tools/fixtures_oracle.py $F || { echo "FAIL setup: fixtures"; exit 1; }
 [[ $($CASES types) == "$($O tools/oracle.py types)" ]] || { echo "FAIL oracle: ggml type table differs from gguf-py"; exit 1; }
 echo "types: $($CASES types | wc -l) ggml types, block and byte sizes identical"
 nr=0; ne=0; nc=0
@@ -30,6 +30,13 @@ for f in $F/*.gguf; do
   cmp -s .work/c.impl "$f" || { echo "FAIL writer: copy of $(basename "$f") differs from the GGUFWriter file"; exit 1; }
   nc=$((nc + 1))
 done
+nj=0
+for f in $F/reject/*.gguf; do
+  got=$($CASES read "$f" 2>&1) || got="crash (exit $?): ${got: -200}"
+  [[ $got == error ]] || { echo "FAIL reject: $(basename "$f") must be rejected, got: ${got:0:120}"; exit 1; }
+  nj=$((nj + 1))
+done
+echo "reject: $nj files with a length, count or offset >= 2^63 rejected"
 echo "oracle: $nr files read identically, $ne rejected as gguf-py rejects them"
 echo "writer: $nc copies byte-identical to the GGUFWriter originals"
 nb=0
