@@ -40,3 +40,4 @@ def rej(name, data):
 put("neg_str", b[:24] + struct.pack("<Q", 0xFFFFFFFFFFFF7960) + b[32:])
 i = find("blk.0.i8"); rej("neg_off", b[:i + 24] + struct.pack("<Q", 0xFFFFFFFFFFFFFFE0) + b[i + 32:])
 i = find("a.arr_u8"); rej("neg_arr", b[:i + 16] + struct.pack("<Q", 1 << 63) + b[i + 24:])
+i = find("blk.0.attn_q.weight"); put("ovf_dims", b[:i + 23] + struct.pack("<QQ", 1 << 32, 1 << 32) + b[i + 39:])

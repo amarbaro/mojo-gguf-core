@@ -133,18 +133,23 @@ struct Gguf(Movable):
         for _ in range(n_tensors):
             var name = self._str()
             var dims = List[Int]()
+            var numel = 1
             for _ in range(self._u(4)):
-                dims.append(self._u(8))
+                var d = self._u(8)
+                if d < 0 or (d != 0 and numel > Int.MAX // d):
+                    raise Error("gguf: ", path, ": tensor ", name, " has dims out of range")
+                numel *= d
+                dims.append(d)
             var ttype = self._u(4)
             var bs = type_size(ttype)
             if bs[0] == 0 and known_types:
                 raise Error("gguf: ", path, ": tensor ", name, " has unknown type ", ttype)
             var off = self._u(8)
-            if off < 0:
-                raise Error("gguf: ", path, ": tensor ", name, " has a negative offset")
+            if off < 0 or (bs[0] != 0 and numel > Int.MAX // bs[1]):
+                raise Error("gguf: ", path, ": tensor ", name, " has an offset or size out of range")
             var t = TensorInfo(name^, dims^, ttype, off, -1)
             if bs[0]:
-                t.nbytes = t.numel() * bs[1] // bs[0]
+                t.nbytes = numel * bs[1] // bs[0]
             self.tensors.append(t^)
         self.data_offset = pad_to(self.pos, self.alignment)
         for i in range(len(self.tensors)):
