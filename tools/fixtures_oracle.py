@@ -39,3 +39,4 @@ def rej(name, data):
     open(os.path.join(D, "reject", name + ".gguf"), "wb").write(data)
 put("neg_str", b[:24] + struct.pack("<Q", 0xFFFFFFFFFFFF7960) + b[32:])
 i = find("blk.0.i8"); rej("neg_off", b[:i + 24] + struct.pack("<Q", 0xFFFFFFFFFFFFFFE0) + b[i + 32:])
+i = find("a.arr_u8"); rej("neg_arr", b[:i + 16] + struct.pack("<Q", 1 << 63) + b[i + 24:])

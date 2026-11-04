@@ -182,6 +182,8 @@ struct Gguf(Movable):
         elif t == T_ARRAY:
             var et = self._u(4)
             var n = self._u(8)
+            if n < 0:
+                raise Error("gguf: ", self.path, ": array length out of range at byte ", self.pos)
             if _width(et):
                 if n > (self.size - self.pos) // _width(et):
                     raise Error("gguf: ", self.path, ": truncated array at byte ", self.pos)
