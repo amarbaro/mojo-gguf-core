@@ -9,7 +9,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p .work
-M=.venv/bin/mojo
+M=${MOJO:-.venv/bin/mojo}
 O="uv run --no-project -q --with gguf==0.19.0 python -I"
 CASES=${CASES:-.work/cases}
 if [[ $CASES == .work/cases ]]; then

@@ -6,5 +6,6 @@ v=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); c=$(sed -n 's/^- \[v\([
 [ "$v" = "$c" ] || { echo "FAIL version: pyproject $v vs newest CHANGELOG entry $c"; exit 1; }
 command -v uv >/dev/null || { echo "FAIL setup: uv not installed"; exit 1; }
 uv sync || { echo "FAIL setup: uv sync"; exit 1; }
+export MOJO="${MOJO:-.venv/bin/mojo}"
 python3 -c 'import platform; print("oracle python", platform.python_version())'
 scripts/check.sh
