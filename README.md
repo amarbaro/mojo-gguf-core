@@ -5,7 +5,8 @@
 <!-- /badges -->
 
 <!-- install -->
-Install: `pixi add mojo-gguf-core` once published. For now: `git clone https://github.com/amarbaro/mojo-gguf-core`, then `mojo run -I mojo-gguf-core/src app.mojo`.
+Install: `pixi workspace channel add https://conda.modular.com/max https://prefix.dev/amarbaro/amarbaro`, then `pixi add mojo-gguf-core` (import `gguf`). From source: `git clone https://github.com/amarbaro/mojo-gguf-core`, then `mojo run -I mojo-gguf-core/src app.mojo`.
+Toolchains: Mojo 1.2 stable, and the nightly 1.3.0.dev2026110805 in the weekly [mojo-libs](https://github.com/amarbaro/mojo-libs) matrix (36 libraries on stable, 35 on nightly).
 
 ```mojo
 from gguf import Gguf, Writer, T_UINT32, T_FLOAT32
@@ -59,6 +60,8 @@ API: [docs/api.md](docs/api.md). Design: [docs/design.md](docs/design.md).
 |---|---|---|
 | 20.9 GB Q4_K_S model, 142 KVs, 733 tensors, 248k tokens | 36 ms, 29 MB | 5,535 ms, 863 MB |
 | gate fixture, 21 KVs, 9 tensors | under 1 ms, 11 MB | 60 ms, 36 MB |
+
+**Limits:** GGUF versions 2 and 3, little-endian only: big-endian files raise (gguf-py byte-swaps them). The writer copies tensor data into one in-memory blob before `save`.
 
 ## Checks
 
