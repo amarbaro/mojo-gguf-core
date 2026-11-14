@@ -1,0 +1,4 @@
+name = "mojo-gguf-core"
+version = "0.1.5"
+description = "Read (mmapped, zero copy) and write GGUF files from Mojo, as gguf-py does"
+tags = ["mojo", "gguf", "llm"]
